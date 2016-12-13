@@ -18,15 +18,32 @@ namespace Day06.ConsoleApplication
             // LINQ only solution (yea, I know... One thing took the other and suddenly the solution was all LINQ'fied)
             var result = Enumerable
                 .Range(0, 8)
-                .Select(col => new { col = col, chars = File.ReadAllLines("input.txt").Select(x => x[col]) })
-                .Select(col => col.chars.GroupBy(u => u).Select(g => new { letter = g.Key, count = g.Count()}).OrderByDescending(o => o.count))
-                .Select(col => new { max = col.First().letter, min = col.Last().letter });
-            
-            var mostOccurences = String.Concat(result.Select(x => x.max));
-            var leastOccurences = String.Concat(result.Select(x => x.min));
+                .Select(col =>
+                    new {
+                        col = col,
+                        chars = File.ReadAllLines("input.txt").Select(x => x[col])
+                    }
+                )
+                .Select(col =>
+                    col.chars.GroupBy(u => u)
+                             .Select(g => new { letter = g.Key, count = g.Count()})
+                             .OrderByDescending(o => o.count)
+                )
+                .Select(col =>
+                    new {
+                        max = col.First().letter.ToString(),
+                        min = col.Last().letter.ToString()
+                    }
+                )
+                .Aggregate((a, b) =>
+                    new {
+                        max = a.max + b.max,
+                        min = a.min + b.min
+                    }
+                );
 
-            Console.WriteLine($"Message using most occurences  : {mostOccurences}");
-            Console.WriteLine($"Message using least occurences : {leastOccurences}");
+            Console.WriteLine($"Message using most occurences  : {result.max}");
+            Console.WriteLine($"Message using least occurences : {result.min}");
             Console.WriteLine();
 
             // End of LINQ solution and start of readable solution for the faint hearted
