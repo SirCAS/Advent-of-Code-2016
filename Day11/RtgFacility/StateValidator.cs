@@ -7,10 +7,10 @@ namespace RtgFacility
         // Elevator only moves with atleast 1 item
         public static bool IsValidElevatorMove(State state)
         {
-            var currentFloor = state.Floors[state.Elevator];
+            var currentFloor = state.Components[state.Elevator];
 
             // Check if elevator is on floor without items
-            if (currentFloor.Components.IsEmpty())
+            if (currentFloor.IsEmpty())
             {
                 return false;
             }
@@ -21,10 +21,10 @@ namespace RtgFacility
         // Chips without matching generator is fried if on same level as foregin generator
         public static bool ChipsAreNotFried(State state)
         {
-            foreach(var floor in state.Floors.Values)
+            foreach(var components in state.Components.Values)
             {
-                var chips = floor.Components.Where(x => x.Type == ComponentType.Chip);
-                var generators = floor.Components.Where(x => x.Type == ComponentType.Generator);
+                var chips = components.Where(x => x.Type == ComponentType.Chip);
+                var generators = components.Where(x => x.Type == ComponentType.Generator);
 
                 // Chips can only be fried if there is both chips and generators
                 if(chips.Any() && generators.Any())
@@ -43,14 +43,15 @@ namespace RtgFacility
         public static bool IsFinalState(State state)
         {
             // Elevator is at 4th assembly floor
-            if(state.Elevator != 4)
+            if(state.Elevator != 3)
             {
                 return false;
             }
 
             // There can only be items at assembly floor
-            var nonAssemblyFloors = state.Floors.Where(x => x.Key != 4);
-            return nonAssemblyFloors.All(x => x.Value.Components.IsEmpty());
+            var nonAssemblyFloors = state.Components.Where(x => x.Key != 3);
+            var result = nonAssemblyFloors.All(x => x.Value.IsEmpty());
+            return result;
         }
     }
 }

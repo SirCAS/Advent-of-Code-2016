@@ -28,7 +28,7 @@ namespace RtgFacility
             {
                 Elevator = 0,
                 Moves = 0,
-                Floors = new Dictionary<int, Floor>()
+                Components = new Dictionary<int, List<Component>>()
             };
 
             var lines = str.Select(x => x.Split("contains")[1])
@@ -40,17 +40,16 @@ namespace RtgFacility
                                 .Where(x => x.Contains("chip"))
                                 .Select(chip => chip.Split('-')[0])
                                 .Select(chip => new Component { Name = chip, Type = ComponentType.Chip });
-                
-                var generators = lines[i]
-                                        .Where(x => x.Contains("generator"))
-                                        .Select(generator => generator.Split(' ')[0])
-                                        .Select(generator => new Component { Name = generator, Type = ComponentType.Generator });
 
-                state.Floors.Add(i, new Floor { Components = chips.Concat(generators).ToList() });
+                var generators = lines[i]
+                                    .Where(x => x.Contains("generator"))
+                                    .Select(generator => generator.Split(' ')[0])
+                                    .Select(generator => new Component { Name = generator, Type = ComponentType.Generator });
+
+                state.Components.Add(i, chips.Concat(generators).ToList());
             }
 
             return state;
         }
     }
 }
-

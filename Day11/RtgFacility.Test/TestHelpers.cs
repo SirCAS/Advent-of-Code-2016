@@ -5,6 +5,23 @@ namespace RtgFacility.Test
 {
     public static class TestHelpers
     {
+        public static State GetState(this string str)
+        {
+            return new State
+            {
+                Elevator = str.Find('E', -2).ToInt() - 1,  // Zero indexed
+                Components = str.Split('\n')
+                                  .ToDictionary(
+                                        f => f.Find('F', 1).ToInt() - 1, // Zero indexed
+                                        f => f.FindAll('G', -1)
+                                            .Select(x => new Component { Type = ComponentType.Generator, Name = x })
+                                            .Concat(f.FindAll('M', -1)
+                                                    .Select(x => new Component { Type = ComponentType.Chip, Name = x }))
+                                            .ToList()
+                                        )
+            };
+        }
+
         public static List<string> FindAll(this string str, char let, int offset)
         {
             var charSplits = str.Split(let).ToList();
