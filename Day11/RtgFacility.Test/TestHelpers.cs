@@ -14,9 +14,9 @@ namespace RtgFacility.Test
                                   .ToDictionary(
                                         f => f.Find('F', 1).ToInt() - 1, // Zero indexed
                                         f => f.FindAll('G', -1)
-                                            .Select(x => new Component { Type = ComponentType.Generator, Name = x })
+                                            .Select(x => "G" + x )
                                             .Concat(f.FindAll('M', -1)
-                                                    .Select(x => new Component { Type = ComponentType.Chip, Name = x }))
+                                                    .Select(x => "C" + x))
                                             .ToList()
                                         )
             };

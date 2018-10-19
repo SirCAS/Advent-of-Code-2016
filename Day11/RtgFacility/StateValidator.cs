@@ -23,14 +23,14 @@ namespace RtgFacility
         {
             foreach(var components in state.Components.Values)
             {
-                var chips = components.Where(x => x.Type == ComponentType.Chip);
-                var generators = components.Where(x => x.Type == ComponentType.Generator);
+                var chips = components.Where(x => x.StartsWith('C')).Select(x => x.Substring(1));
+                var generators = components.Where(x => x.StartsWith('G')).Select(x => x.Substring(1));
 
                 // Chips can only be fried if there is both chips and generators
                 if(chips.Any() && generators.Any())
                 {
                     // Every chip must have a shield when there is an generator
-                    if(chips.Any(c => !generators.Any(g => g.Name == c.Name)))
+                    if(chips.Any(c => !generators.Any(g => g == c)))
                     {
                         return false;
                     }

@@ -15,56 +15,48 @@ namespace RtgFacility
             Console.WriteLine("+-------------------------+");
 
             var initialState = File
-                .ReadAllLines("input.part2.txt")
+                .ReadAllLines("input.test.txt")
                 .ToArray()
                 .GetInitialState();
 
-            var sw = new Stopwatch();
-            
-            sw.Start();
+            Console.WriteLine("Initial state:");
+            Console.WriteLine(initialState.ToPrettyString());
 
-            var visited = new StateWatcher();
+            var visited = new HashSet<State>(new StateComparer());
             visited.Add(initialState);
 
             var frontier = new Queue<State>();
             frontier.Enqueue(initialState);
 
-            var x = 0;
-            var df = 0;
-            var dv = 0;
+            var stateGenerator = new StateGenerator();
+
+            var sw = new Stopwatch();
+            sw.Start();
+
+            var iterations = 0;
             while(frontier.Count > 0)
             {
-                if(++x % 10000 == 0)
+                if(++iterations % 10000 == 0)
                 {
-                    Console.WriteLine($"Current states is {frontier.Count:D10} ({(frontier.Count-df):D6}) and visited {visited.Count:D10} ({(visited.Count-dv):D6})");
-                    df = frontier.Count;
-                    dv = visited.Count;
+                    Console.WriteLine($"Queued states is {frontier.Count:D10} and evaluated {visited.Count:D10} after {sw.Elapsed.TotalSeconds:F1} seconds");
                 }
-                    
 
                 var current = frontier.Dequeue();
-
-                //Console.WriteLine(new StateWatcher().Prettify(current));
-
-                if(current.IsFinished())
+                if(StateValidator.IsFinalState(current))
                 {
-                    Console.WriteLine($"Found solution with {current.Moves}");
+                    sw.Stop();
+                    Console.WriteLine($"Found solution with {current.Moves} moves after {sw.Elapsed.TotalSeconds:F1} seconds");
                     break;
                 }
 
-                foreach(var next in current.GetNextMoves())
+                foreach(var next in stateGenerator.Next(current))
                 {
-                    if(!visited.Contains(next))
+                    if(visited.Add(next))
                     {
                         frontier.Enqueue(next);
-                        visited.Add(next);
                     }
                 }
             }
-
-            sw.Stop();
-
-            Console.WriteLine($"Simulation took {sw.Elapsed.TotalMinutes} minutes");
 
             Console.WriteLine("  -Glædelig jul!");
         }

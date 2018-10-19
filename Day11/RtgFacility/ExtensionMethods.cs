@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace RtgFacility
 {
@@ -22,13 +23,51 @@ namespace RtgFacility
             return lst.Count() == 0;
         }
 
+        public static string ToPrettyString(this State state)
+        {
+            StringBuilder str = new StringBuilder();
+
+            var ordered = state.Components.OrderBy(x => x.Key).Select(x => x.Value).ToArray();
+
+            var maxCols = ordered.Max(x => x.Count);
+
+            for (int x = ordered.Length - 1; x > -1; x--)
+            {
+                str.Append($"F{x} ");
+                if (x == state.Elevator)
+                {
+                    str.Append("E ");
+                }
+                else
+                {
+                    str.Append(". ");
+                }
+
+                for (int y = 0; y < maxCols; y++)
+                {
+                    if (ordered[x].Count > y)
+                    {
+                        str.Append(ordered[x][y]);
+                        str.Append(" ");
+                    }
+                    else
+                    {
+                        str.Append(".   ");
+                    }
+                }
+                str.AppendLine();
+            }
+
+            return str.ToString();
+        }
+
         public static State GetInitialState(this string[] str)
         {
             var state = new State
             {
                 Elevator = 0,
                 Moves = 0,
-                Components = new Dictionary<int, List<Component>>()
+                Components = new Dictionary<int, List<string>>()
             };
 
             var lines = str.Select(x => x.Split("contains")[1])
@@ -39,12 +78,12 @@ namespace RtgFacility
                 var chips = lines[i]
                                 .Where(x => x.Contains("chip"))
                                 .Select(chip => chip.Split('-')[0])
-                                .Select(chip => new Component { Name = chip, Type = ComponentType.Chip });
+                                .Select(chip => "C" + chip.Substring(0, 2).ToUpperInvariant());
 
                 var generators = lines[i]
                                     .Where(x => x.Contains("generator"))
                                     .Select(generator => generator.Split(' ')[0])
-                                    .Select(generator => new Component { Name = generator, Type = ComponentType.Generator });
+                                    .Select(generator => "G" + generator.Substring(0, 2).ToUpperInvariant());
 
                 state.Components.Add(i, chips.Concat(generators).ToList());
             }
