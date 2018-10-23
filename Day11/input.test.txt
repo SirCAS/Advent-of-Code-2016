@@ -1,0 +1,4 @@
+The first floor contains a aa-compatible microchip and a bb-compatible microchip.
+The second floor contains a aa generator.
+The third floor contains a bb generator.
+The fourth floor contains nothing relevant.

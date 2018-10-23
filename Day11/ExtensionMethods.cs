@@ -18,18 +18,13 @@ namespace RtgFacility
                         );
         }
 
-        public static bool IsEmpty<T>(this IEnumerable<T> lst)
-        {
-            return lst.Count() == 0;
-        }
-
         public static string ToPrettyString(this State state)
         {
             StringBuilder str = new StringBuilder();
 
-            var ordered = state.Components.OrderBy(x => x.Key).Select(x => x.Value).ToArray();
+            var ordered = state.Components.OrderBy(x => x.Key).Select(x => x.Value.ToArray()).ToArray();
 
-            var maxCols = ordered.Max(x => x.Count);
+            var maxCols = ordered.Max(x => x.Count());
 
             for (int x = ordered.Length - 1; x > -1; x--)
             {
@@ -45,7 +40,7 @@ namespace RtgFacility
 
                 for (int y = 0; y < maxCols; y++)
                 {
-                    if (ordered[x].Count > y)
+                    if (ordered[x].Count() > y)
                     {
                         str.Append(ordered[x][y]);
                         str.Append(" ");
@@ -63,12 +58,7 @@ namespace RtgFacility
 
         public static State GetInitialState(this string[] str)
         {
-            var state = new State
-            {
-                Elevator = 0,
-                Moves = 0,
-                Components = new Dictionary<int, List<string>>()
-            };
+            var components = new Dictionary<int, HashSet<string>>();
 
             var lines = str.Select(x => x.Split("contains")[1])
                            .Select(x => x.Split(" a ", StringSplitOptions.RemoveEmptyEntries)).ToArray();
@@ -85,10 +75,10 @@ namespace RtgFacility
                                     .Select(generator => generator.Split(' ')[0])
                                     .Select(generator => "G" + generator.Substring(0, 2).ToUpperInvariant());
 
-                state.Components.Add(i, chips.Concat(generators).ToList());
+                components.Add(i, chips.Concat(generators).ToHashSet());
             }
 
-            return state;
+            return new State(0, 0, components);
         }
     }
 }

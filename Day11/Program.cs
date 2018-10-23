@@ -14,8 +14,15 @@ namespace RtgFacility
             Console.WriteLine("| Advent of Code - Day 11 |");
             Console.WriteLine("+-------------------------+");
 
+            SolvePuzzle();
+
+            Console.WriteLine("  -Glædelig jul!");
+        }
+
+        private static void SolvePuzzle()
+        {
             var initialState = File
-                .ReadAllLines("input.test.txt")
+                .ReadAllLines("input.2.txt")
                 .ToArray()
                 .GetInitialState();
 
@@ -34,32 +41,29 @@ namespace RtgFacility
             sw.Start();
 
             var iterations = 0;
-            while(frontier.Count > 0)
+            while (frontier.Count > 0)
             {
-                if(++iterations % 10000 == 0)
+                if (++iterations % 10000 == 0)
                 {
                     Console.WriteLine($"Queued states is {frontier.Count:D10} and evaluated {visited.Count:D10} after {sw.Elapsed.TotalSeconds:F1} seconds");
                 }
-
+                
                 var current = frontier.Dequeue();
-                if(StateValidator.IsFinalState(current))
+                foreach (var next in stateGenerator.Next(current))
                 {
-                    sw.Stop();
-                    Console.WriteLine($"Found solution with {current.Moves} moves after {sw.Elapsed.TotalSeconds:F1} seconds");
-                    break;
-                }
-
-                foreach(var next in stateGenerator.Next(current))
-                {
-                    if(visited.Add(next))
+                    if (visited.Add(next))
                     {
+                        if (StateValidator.IsFinalState(next))
+                        {
+                            sw.Stop();
+                            Console.WriteLine($"Found solution with {next.Moves} moves after {sw.Elapsed.TotalSeconds:F1} seconds");
+                            return;
+                        }
+
                         frontier.Enqueue(next);
                     }
                 }
             }
-
-            Console.WriteLine("  -Glædelig jul!");
         }
     }
 }
-
